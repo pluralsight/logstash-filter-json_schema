@@ -3,19 +3,22 @@ require_relative '../spec_helper'
 require "logstash/filters/json_schema"
 
 describe LogStash::Filters::JsonSchema do
-  describe "Set to Hello World" do
+  describe "Validating schema" do
     let(:config) do <<-CONFIG
       filter {
         json_schema {
-          message => "Hello World"
+          schema => '{"type": "object", "properties": {"userId": {"type": "string" } }, "required":["userId"] }'
         }
       }
     CONFIG
     end
 
-    sample("message" => "some text") do
-      expect(subject).to include("message")
-      expect(subject.get('message')).to eq('Hello World')
+    sample("message" => "{}") do
+      expect(subject).to include("tags")
+      expect(subject.get('tags')).to include('jsonschemafailure')
+    end
+    sample("message" => '{"userId": "123" }') do
+      expect(subject).not_to include("tags")
     end
   end
 end

@@ -1,26 +1,19 @@
 # encoding: utf-8
 require "logstash/filters/base"
 require "logstash/namespace"
+require "rubygems"
+require "json-schema"
 
-# This  filter will replace the contents of the default 
-# message field with whatever you specify in the configuration.
+# This  filter will validate the message against a json schema
+# provided in the configuration.
 #
-# It is only intended to be used as an .
+# It adds a jsonschemafailure tag if the message does not validate
 class LogStash::Filters::JsonSchema < LogStash::Filters::Base
 
-  # Setting the config_name here is required. This is how you
-  # configure this filter from your Logstash config.
-  #
-  # filter {
-  #    {
-  #     message => "My message..."
-  #   }
-  # }
-  #
   config_name "json_schema"
   
-  # Replace the message with this value.
-  config :message, :validate => :string, :default => "Hello World!"
+  # The schema to validate messages against.
+  config :schema, :validate => :string, :default => "{}"
   
 
   public
@@ -30,11 +23,12 @@ class LogStash::Filters::JsonSchema < LogStash::Filters::Base
 
   public
   def filter(event)
-
-    if @message
-      # Replace the event message with our message as configured in the
-      # config file.
-      event.set("message", @message)
+    body = event.get("message")
+    if !JSON::Validator.validate(@schema, body)
+      tags = event.get("tags")
+      tags = [] if !tags
+      tags.push("jsonschemafailure")
+      event.set("tags", tags)
     end
 
     # filter_matched should go in the last line of our successful code
