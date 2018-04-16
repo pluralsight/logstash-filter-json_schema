@@ -2,10 +2,9 @@ Gem::Specification.new do |s|
   s.name          = 'logstash-filter-json_schema'
   s.version       = '0.1.0'
   s.licenses      = ['Apache-2.0']
-  s.summary       = 'TODO: Write a short summary, because Rubygems requires one.'
-  s.description   = 'TODO: Write a longer description or delete this line.'
-  s.homepage      = 'TODO: Put your plugin''s website or public repo URL here.'
-  s.authors       = ['Neil Sorensen']
+  s.summary       = 'Validates json input against a provided schema (https://json-schema.org)'
+  s.homepage      = 'https://github.com/pluralsight/logstash-filter-json_schema'
+  s.authors       = ['Neil Sorensen', 'Kay Johansen']
   s.email         = 'neil-sorensen@pluralsight.com'
   s.require_paths = ['lib']
 
