@@ -24,14 +24,23 @@ class LogStash::Filters::JsonSchema < LogStash::Filters::Base
   public
   def filter(event)
     body = event.get("message")
-    if !JSON::Validator.validate(@schema, body)
-      tags = event.get("tags")
-      tags = [] if !tags
-      tags.push("jsonschemafailure")
-      event.set("tags", tags)
+    begin
+      if !JSON::Validator.validate(@schema, body)
+        tag_as_schema_failure(event)
+      end
+    rescue Exception => e
+      logger.error("Exception thrown while validating entry", { "schema" => @schema, "log entry" => body, "exception" => e})
+      tag_as_schema_failure(event)
     end
 
     # filter_matched should go in the last line of our successful code
     filter_matched(event)
   end # def filter
+
+  def tag_as_schema_failure(event)
+    tags = event.get("tags")
+    tags = [] if !tags
+    tags.push("jsonschemafailure")
+    event.set("tags", tags)
+  end
 end # class LogStash::Filters::JsonSchema
