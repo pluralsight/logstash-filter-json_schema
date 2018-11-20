@@ -15,6 +15,8 @@ class LogStash::Filters::JsonSchema < LogStash::Filters::Base
   # The schema to validate messages against.
   config :schema, :validate => :string, :default => "{}"
   
+  # The source field from the event to validate
+  config :source, :validate => :string, :default => "message"
 
   public
   def register
@@ -23,7 +25,7 @@ class LogStash::Filters::JsonSchema < LogStash::Filters::Base
 
   public
   def filter(event)
-    body = event.get("message")
+    body = event.get(@source)
     begin
       if !JSON::Validator.validate(@schema, body)
         tag_as_schema_failure(event)
