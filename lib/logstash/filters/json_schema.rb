@@ -29,7 +29,7 @@ class LogStash::Filters::JsonSchema < LogStash::Filters::Base
         tag_as_schema_failure(event)
       end
     rescue Exception => e
-      logger.error("Exception thrown while validating entry", { "schema" => @schema, "log entry" => body, "exception" => e})
+      logger.error("Exception thrown while validating entry", { "schema" => @schema, "log entry" => body, "exception" => e, "trace" => e.backtrace.join(";")})
       tag_as_schema_failure(event)
     end
 
